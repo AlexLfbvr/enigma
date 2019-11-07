@@ -16,8 +16,9 @@ class OrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('name')
             ->add('status', ChoiceType::class, [
-               'choices' => array_combine(Order::STATUSES, Order::STATUSES)
+                'choices' => array_combine(Order::STATUSES, Order::STATUSES)
             ])
             ->add('selections', CollectionType::class, [
                 'entry_type' => SelectionType::class,

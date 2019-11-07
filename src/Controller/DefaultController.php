@@ -6,13 +6,21 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DefaultController
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage): Response
     {
-        $name = $request->query->get('name', 'Anonymous');
-
-        return new Response("Hello $name!");
+        if ($authorizationChecker->isGranted(
+            'firstLetter',
+            $user = $tokenStorage->getToken()->getUser()
+                )
+            )
+        {
+            return new Response("Hello $user!");
+        }
+        return new Response('Vous n\'avez pas accès à cette page.');
     }
 }

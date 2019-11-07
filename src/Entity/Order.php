@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Order
 {
     public const STATUSES = ['En préparation', 'Prêt', 'Emporté'];
-
     /**
      * @var int
      * @ORM\Column(type="integer")
@@ -40,17 +39,29 @@ class Order
      * @Assert\Type("integer")
      */
     private $amount;
-
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Selection", mappedBy="myOrder", orphanRemoval=true, fetch="EAGER", cascade={"persist"})
      */
     private $selections;
-
+    /**
+     * @ORM\Column(options={"default"="anon."})
+     * @Assert\NotBlank()
+     * @Assert\Length(min=1)
+     * @Assert\Type("string")
+     */
+    private $name;
     public function __construct()
     {
         $this->selections = new ArrayCollection();
     }
-
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
     /**
      * @return int
      */
@@ -58,7 +69,6 @@ class Order
     {
         return $this->number;
     }
-
     /**
      * @param int $number
      */
@@ -66,7 +76,6 @@ class Order
     {
         $this->number = $number;
     }
-
     /**
      * @return string
      */
@@ -74,7 +83,6 @@ class Order
     {
         return $this->status;
     }
-
     /**
      * @param string $status
      */
@@ -82,7 +90,6 @@ class Order
     {
         $this->status = $status;
     }
-
     /**
      * @return int
      */
@@ -90,7 +97,6 @@ class Order
     {
         return $this->amount;
     }
-
     /**
      * @param int $amount
      */
@@ -98,7 +104,6 @@ class Order
     {
         $this->amount = $amount;
     }
-
     /**
      * @return Collection|Selection[]
      */
@@ -106,7 +111,6 @@ class Order
     {
         return $this->selections;
     }
-
     public function addSelection(Selection $selection): self
     {
         if (!$this->selections->contains($selection)) {
@@ -114,10 +118,8 @@ class Order
             $selection->setMyOrder($this);
             $this->amount += $selection->getQuantity() * $selection->getProduct()->getPrice();
         }
-
         return $this;
     }
-
     public function removeSelection(Selection $selection): self
     {
         if ($this->selections->contains($selection)) {
@@ -126,10 +128,8 @@ class Order
             if ($selection->getMyOrder() === $this) {
                 $selection->setMyOrder(null);
             }
-
             $this->amount -= $selection->getQuantity() * $selection->getProduct()->getPrice();
         }
-
         return $this;
     }
 }
